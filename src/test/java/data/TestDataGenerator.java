@@ -31,4 +31,21 @@ public class TestDataGenerator {
                                 )
                 );
     }
+
+    public static Book defaultBook() {
+
+        return Book
+                .builder()
+                .id(1)
+                .title("Book 1")
+                .description("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
+                .pageCount(100)
+                .excerpt("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
+                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
+                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
+                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
+                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
+                .publishDate("2026-03-03T10:38:24.3862865+00:00")
+                .build();
+    }
 }

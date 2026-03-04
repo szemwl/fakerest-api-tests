@@ -3,6 +3,7 @@ package api.client;
 import api.model.Book;
 import api.spec.RequestSpec;
 import api.spec.ResponseSpec;
+import io.restassured.response.Response;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class BookClient {
         return given()
                 .spec(RequestSpec.requestSpec())
                 .when()
-                .get(BOOKS + "/" + bookId)
+                .get(BOOKS + "/{id}", bookId)
                 .then()
                 .spec(ResponseSpec.ok200())
                 .extract()
@@ -56,18 +57,24 @@ public class BookClient {
         given()
                 .spec(RequestSpec.requestSpec())
                 .when()
-                .delete(BOOKS + "/" + bookId)
+                .delete(BOOKS + "/{id}", bookId)
                 .then()
                 .spec(ResponseSpec.ok200());
     }
 
-    public int getBookStatusCode(int bookId) {
+    public Response getBookResponse(int bookId) {
         return given()
                 .spec(RequestSpec.requestSpec())
                 .when()
-                .get(BOOKS + "/" + bookId)
-                .then()
-                .extract()
-                .statusCode();
+                .get(BOOKS + "/{id}", bookId);
+    }
+
+    public Response createBookResponse(Book book) {
+
+        return given()
+                .spec(RequestSpec.requestSpec())
+                .body(book)
+                .when()
+                .post(BOOKS);
     }
 }

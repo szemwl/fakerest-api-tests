@@ -1,15 +1,15 @@
 package tests;
 
 import api.model.Book;
-import api.spec.RequestSpec;
 import api.spec.ResponseSpec;
+import data.TestDataGenerator;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,19 +20,7 @@ public class BookTests extends BaseTest {
     @Test
     void testCreateBook() {
 
-        Book book = Book
-                .builder()
-                .id(1)
-                .title("Book 1")
-                .description("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
-                .pageCount(100)
-                .excerpt("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
-                .publishDate("2026-03-03T10:38:24.3862865+00:00")
-                .build();
+        Book book = TestDataGenerator.defaultBook();
 
         Book createdBook = bookClient.createBook(book);
 
@@ -43,24 +31,14 @@ public class BookTests extends BaseTest {
     @Test
     void testGetBookById() {
 
-        Book book = Book
-                .builder()
-                .id(1)
-                .title("Book 1")
-                .description("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
-                .pageCount(100)
-                .excerpt("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
-                .publishDate("2026-03-03T10:38:24.3862865+00:00")
-                .build();
+        Book book = TestDataGenerator.defaultBook();
 
-        Book recivedBook = bookClient.getBookById(book.getId());
+        Book createdBook = bookClient.createBook(book);
 
-        assertEquals(book.getId(), recivedBook.getId());
-        assertNotNull(recivedBook.getTitle());
+        Book receivedBook = bookClient.getBookById(createdBook.getId());
+
+        assertEquals(createdBook.getId(), receivedBook.getId());
+        assertEquals(createdBook.getTitle(), receivedBook.getTitle());
     }
 
     @Test
@@ -75,19 +53,7 @@ public class BookTests extends BaseTest {
     @Test
     void testDeleteBook() {
 
-        Book book = Book
-                .builder()
-                .id(1)
-                .title("Book 1")
-                .description("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
-                .pageCount(100)
-                .excerpt("Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n" +
-                        "Lorem lorem lorem. Lorem lorem lorem. Lorem lorem lorem.\n")
-                .publishDate("2026-03-03T10:38:24.3862865+00:00")
-                .build();
+        Book book = TestDataGenerator.defaultBook();
 
         Book createdBook = bookClient.createBook(book);
 
@@ -101,9 +67,9 @@ public class BookTests extends BaseTest {
 
         int nonExistingId = 999_999_999;
 
-        int statusCode = bookClient.getBookStatusCode(nonExistingId);
+        Response response = bookClient.getBookResponse(nonExistingId);
 
-        assertEquals(404, statusCode);
+        assertEquals(404, response.getStatusCode());
     }
 
     @ParameterizedTest
@@ -118,21 +84,11 @@ public class BookTests extends BaseTest {
     @Test
     void testBookSchema() {
 
-        Book book = Book.builder()
-                .id(5555)
-                .title("Schema Test")
-                .description("Desc")
-                .pageCount(123)
-                .excerpt("Ex")
-                .publishDate("2024-01-01T00:00:00")
-                .build();
+        Book book = TestDataGenerator.defaultBook();
 
-        given()
-                .spec(RequestSpec.requestSpec())
-                .body(book)
-                .when()
-                .post("/api/v1/Books")
-                .then()
+        Response response = bookClient.createBookResponse(book);
+
+        response.then()
                 .spec(ResponseSpec.ok200())
                 .body(matchesJsonSchemaInClasspath("schema/book-schema.json"));
     }
