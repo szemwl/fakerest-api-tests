@@ -1,4 +1,4 @@
-package tests;
+package tests.api;
 
 import api.model.Book;
 import api.spec.ResponseSpec;
