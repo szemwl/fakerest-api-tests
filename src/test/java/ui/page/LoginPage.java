@@ -3,16 +3,14 @@ package ui.page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class LoginPage {
-
-    private final WebDriver driver;
+public class LoginPage extends BasePage {
 
     private final By username = By.id("user-name");
     private final By password = By.id("password");
     private final By loginButton = By.id("login-button");
 
     public LoginPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     public void open() {
@@ -20,14 +18,14 @@ public class LoginPage {
     }
 
     public void enterUsername(String user) {
-        driver.findElement(username).sendKeys(user);
+        type(username, user);
     }
 
     public void enterPassword(String pass) {
-        driver.findElement(password).sendKeys(pass);
+        type(password, pass);
     }
 
     public void clickLogin() {
-        driver.findElement(loginButton).click();
+        click(loginButton);
     }
 }
