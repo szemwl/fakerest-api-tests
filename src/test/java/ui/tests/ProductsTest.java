@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import ui.driver.Browser;
 import ui.driver.DriverFactory;
+import ui.model.Product;
 import ui.model.SortType;
 import ui.steps.CheckoutSteps;
 import ui.steps.LoginSteps;
@@ -15,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -185,5 +187,32 @@ public class ProductsTest extends BaseTest {
 
             assertEquals(expected, actual);
         }
+    }
+
+    @Test
+    public void shouldMatchProductCardWithDetailsPage() {
+
+        driver = DriverFactory.createDriver(Browser.CHROME);
+
+        LoginSteps loginSteps = new LoginSteps(driver);
+        ProductsSteps productsSteps = new ProductsSteps(driver);
+
+        loginSteps
+                .openLoginPage()
+                .login(USERNAME, PASSWORD);
+
+        int randomIndex = RANDOM.nextInt(6);
+
+        Product productFromList = productsSteps.getProduct(randomIndex);
+
+        productsSteps.openProduct(randomIndex);
+
+        Product productFromDetails = productsSteps.getProductDetails();
+
+        assertAll(
+                () -> assertEquals(productFromList.getName(), productFromDetails.getName()),
+                () -> assertEquals(productFromList.getDescription(), productFromDetails.getDescription()),
+                () -> assertEquals(productFromList.getPrice(), productFromDetails.getPrice())
+        );
     }
 }

@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+import ui.model.Product;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,10 @@ public class ProductsPage extends BasePage {
     private final By sortDropdown = By.className("product_sort_container");
     private final By productName = By.className("inventory_item_name");
     private final By productPrice = By.className("inventory_item_price");
+    private final By productDescription = By.className("inventory_item_desc");
+    private final By productDetailsName = By.className("inventory_details_name");
+    private final By productDetailsPrice = By.className("inventory_details_price");
+    private final By productDetailsDescription = By.className("inventory_details_desc");
 
     public ProductsPage(WebDriver driver) {
         super(driver);
@@ -77,5 +82,32 @@ public class ProductsPage extends BasePage {
                 .map(text -> text.replace("$", ""))
                 .map(Double::parseDouble)
                 .collect(Collectors.toList());
+    }
+
+    public void openProduct(int index) {
+        findAll(By.className("inventory_item_name"))
+                .get(index)
+                .click();
+    }
+
+    public Product getProduct(int index) {
+
+        List<WebElement> items = findAll(productName);
+        WebElement item = items.get(index);
+
+        String name = item.findElement(productName).getText();
+        String desc = item.findElement(productDescription).getText();
+        String price = item.findElement(productPrice).getText();
+
+        return new Product(name, desc, price);
+    }
+
+    public Product getProductDetails() {
+
+        String name = find(productDetailsName).getText();
+        String desc = find(productDetailsDescription).getText();
+        String price = find(productDetailsPrice).getText();
+
+        return new Product(name, desc, price);
     }
 }

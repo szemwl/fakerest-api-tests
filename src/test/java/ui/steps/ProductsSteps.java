@@ -1,6 +1,9 @@
 package ui.steps;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import ui.model.Product;
 import ui.page.CartPage;
 import ui.page.ProductsPage;
 
@@ -88,5 +91,18 @@ public class ProductsSteps {
 
     public List<Double> getProductPrices() {
         return productsPage.getProductPrices();
+    }
+
+    public ProductsSteps openProduct(int index) {
+        productsPage.openProduct(index);
+        return this;
+    }
+
+    public Product getProduct(int index) {
+        return productsPage.getProduct(index);
+    }
+
+    public Product getProductDetails() {
+        return productsPage.getProductDetails();
     }
 }
