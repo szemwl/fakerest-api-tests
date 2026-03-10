@@ -76,4 +76,17 @@ public class ProductsSteps {
         cartPage.checkout();
         return this;
     }
+
+    public ProductsSteps selectSort(String value) {
+        productsPage.selectSort(value);
+        return this;
+    }
+
+    public List<String> getProductNames() {
+        return productsPage.getProductNames();
+    }
+
+    public List<Double> getProductPrices() {
+        return productsPage.getProductPrices();
+    }
 }

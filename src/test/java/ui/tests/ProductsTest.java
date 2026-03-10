@@ -1,12 +1,16 @@
 package ui.tests;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import ui.driver.Browser;
 import ui.driver.DriverFactory;
+import ui.model.SortType;
 import ui.steps.CheckoutSteps;
 import ui.steps.LoginSteps;
 import ui.steps.ProductsSteps;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -134,5 +138,52 @@ public class ProductsTest extends BaseTest {
                 .backToProductsBtn();
 
         assertEquals(EMPTY_CART, productsSteps.getCartItemsCount());
+    }
+
+    @ParameterizedTest
+    @EnumSource(SortType.class)
+    public void shouldSortProducts(SortType sortType) {
+        driver = DriverFactory.createDriver(Browser.CHROME);
+
+        LoginSteps loginSteps = new LoginSteps(driver);
+        ProductsSteps productsSteps = new ProductsSteps(driver);
+
+        loginSteps
+                .openLoginPage()
+                .login(USERNAME, PASSWORD);
+
+        productsSteps.selectSort(sortType.getValue());
+
+        if (sortType.getValue().equals("az")) {
+            List<String> actual = productsSteps.getProductNames();
+            List<String> expected = new ArrayList<>(actual);
+            Collections.sort(expected);
+
+            assertEquals(expected, actual);
+        }
+
+        if (sortType.getValue().equals("za")) {
+            List<String> actual = productsSteps.getProductNames();
+            List<String> expected = new ArrayList<>(actual);
+            expected.sort(Collections.reverseOrder());
+
+            assertEquals(expected, actual);
+        }
+
+        if (sortType.getValue().equals("lohi")) {
+            List<Double> actual = productsSteps.getProductPrices();
+            List<Double> expected = new ArrayList<>(actual);
+            Collections.sort(expected);
+
+            assertEquals(expected, actual);
+        }
+
+        if (sortType.getValue().equals("hilo")) {
+            List<Double> actual = productsSteps.getProductPrices();
+            List<Double> expected = new ArrayList<>(actual);
+            expected.sort(Collections.reverseOrder());
+
+            assertEquals(expected, actual);
+        }
     }
 }
