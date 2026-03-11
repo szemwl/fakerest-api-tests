@@ -4,13 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import ui.driver.Browser;
-import ui.driver.DriverFactory;
 import ui.model.Product;
 import ui.model.SortType;
-import ui.steps.CheckoutSteps;
-import ui.steps.LoginSteps;
-import ui.steps.ProductsSteps;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,18 +21,18 @@ public class ProductsTest extends BaseTest {
 
     private static final int EMPTY_CART = 0;
     private static final int ONE_PRODUCT = 1;
+
     private static final String USERNAME = "standard_user";
     private static final String GLITCH_USERNAME = "performance_glitch_user";
     private static final String PASSWORD = "secret_sauce";
+
     private static final String PRODUCT_BACKPACK = "sauce-labs-backpack";
+
     private static final Random RANDOM = new Random();
 
     @Test
     public void shouldAddAndRemoveProductFromCart() {
-        driver = DriverFactory.createDriver(Browser.CHROME);
-
-        LoginSteps loginSteps = new LoginSteps(driver);
-        ProductsSteps productsSteps = new ProductsSteps(driver);
+        initDriver();
 
         loginSteps
                 .openLoginPage()
@@ -60,10 +55,8 @@ public class ProductsTest extends BaseTest {
 
     @Test
     public void shouldAddThreeRandomProductsAndRemoveOneFromCart() {
-        driver = DriverFactory.createDriver(Browser.CHROME);
+        initDriver();
 
-        LoginSteps loginSteps = new LoginSteps(driver);
-        ProductsSteps productsSteps = new ProductsSteps(driver);
         int expectedCartItems = 0;
 
         loginSteps
@@ -104,11 +97,7 @@ public class ProductsTest extends BaseTest {
 
     @Test
     public void shouldCompleteCheckoutWithCorrectProducts() {
-        driver = DriverFactory.createDriver(Browser.CHROME);
-
-        LoginSteps loginSteps = new LoginSteps(driver);
-        ProductsSteps productsSteps = new ProductsSteps(driver);
-        CheckoutSteps checkoutSteps = new CheckoutSteps(driver);
+        initDriver();
 
         loginSteps
                 .openLoginPage()
@@ -150,10 +139,7 @@ public class ProductsTest extends BaseTest {
     @ParameterizedTest
     @EnumSource(SortType.class)
     public void shouldSortProducts(SortType sortType) {
-        driver = DriverFactory.createDriver(Browser.CHROME);
-
-        LoginSteps loginSteps = new LoginSteps(driver);
-        ProductsSteps productsSteps = new ProductsSteps(driver);
+        initDriver();
 
         loginSteps
                 .openLoginPage()
@@ -195,10 +181,7 @@ public class ProductsTest extends BaseTest {
 
     @Test
     public void shouldMatchProductCardWithDetailsPage() {
-        driver = DriverFactory.createDriver(Browser.CHROME);
-
-        LoginSteps loginSteps = new LoginSteps(driver);
-        ProductsSteps productsSteps = new ProductsSteps(driver);
+        initDriver();
 
         loginSteps
                 .openLoginPage()
@@ -217,11 +200,7 @@ public class ProductsTest extends BaseTest {
 
     @Test
     public void shouldShowErrorWhenCheckoutWithEmptyRequiredFields() {
-        driver = DriverFactory.createDriver(Browser.CHROME);
-
-        LoginSteps loginSteps = new LoginSteps(driver);
-        ProductsSteps productsSteps = new ProductsSteps(driver);
-        CheckoutSteps checkoutSteps = new CheckoutSteps(driver);
+        initDriver();
 
         loginSteps
                 .openLoginPage()
@@ -251,11 +230,7 @@ public class ProductsTest extends BaseTest {
     @ParameterizedTest
     @ValueSource(strings = {GLITCH_USERNAME, USERNAME})
     void shouldCompletePurchaseForStandardAndGlitchUsers(String name) {
-        driver = DriverFactory.createDriver(Browser.CHROME);
-
-        LoginSteps loginSteps = new LoginSteps(driver);
-        ProductsSteps productsSteps = new ProductsSteps(driver);
-        CheckoutSteps checkoutSteps = new CheckoutSteps(driver);
+        initDriver();
 
         loginSteps
                 .openLoginPage()
