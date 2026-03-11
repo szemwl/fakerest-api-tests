@@ -29,4 +29,16 @@ public class CheckoutSteps {
         checkoutPage.backToProductsBtn();
         return this;
     }
+
+    public boolean isErrorContainerDisplayed() {
+        return checkoutPage.isErrorContainerDisplayed();
+    }
+
+    public String getErrorContainerText() {
+        return checkoutPage.getErrorContainerText();
+    }
+
+    public boolean isCheckoutOverviewPageOpened() {
+        return checkoutPage.isCheckoutOverviewPageOpened();
+    }
 }

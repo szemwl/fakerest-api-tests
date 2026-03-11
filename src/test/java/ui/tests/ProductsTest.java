@@ -26,7 +26,9 @@ public class ProductsTest extends BaseTest {
     private static final int EMPTY_CART = 0;
     private static final int ONE_PRODUCT = 1;
     private static final String USERNAME = "standard_user";
+    private static final String GLITCH_USER = "performance_glitch_user";
     private static final String PASSWORD = "secret_sauce";
+    private static final String PRODUCT_BACKPACK = "sauce-labs-backpack";
     private static final Random RANDOM = new Random();
 
     @Test
@@ -36,22 +38,20 @@ public class ProductsTest extends BaseTest {
         LoginSteps loginSteps = new LoginSteps(driver);
         ProductsSteps productsSteps = new ProductsSteps(driver);
 
-        String productId = "sauce-labs-backpack";
-
         loginSteps
                 .openLoginPage()
                 .login(USERNAME, PASSWORD);
 
         productsSteps
-                .addProductToCart(productId);
+                .addProductToCart(PRODUCT_BACKPACK);
 
-        assertFalse(productsSteps.isAddToCartButtonVisible(productId));
-        assertTrue(productsSteps.isRemoveButtonVisible(productId));
+        assertFalse(productsSteps.isAddToCartButtonVisible(PRODUCT_BACKPACK));
+        assertTrue(productsSteps.isRemoveButtonVisible(PRODUCT_BACKPACK));
         assertEquals(ONE_PRODUCT, productsSteps.getProductsPageCartCounter());
 
         productsSteps
                 .openCart()
-                .removeProductFromCart(productId);
+                .removeProductFromCart(PRODUCT_BACKPACK);
 
         assertEquals(EMPTY_CART, productsSteps.getCartBadgeCount());
         assertEquals(EMPTY_CART, productsSteps.getCartItemsCount());
@@ -70,9 +70,7 @@ public class ProductsTest extends BaseTest {
                 .login(USERNAME, PASSWORD);
 
         List<String> productIdList = productsSteps.getAllProductIds();
-
         Collections.shuffle(productIdList, RANDOM);
-
         List<String> randomProducts = productIdList.subList(0, 3);
 
         for (String randomProduct : randomProducts) {
@@ -116,9 +114,7 @@ public class ProductsTest extends BaseTest {
                 .login(USERNAME, PASSWORD);
 
         List<String> productIdList = productsSteps.getAllProductIds();
-
         Collections.shuffle(productIdList, RANDOM);
-
         List<String> randomProducts = productIdList.subList(0, 2);
 
         for (String randomProduct : randomProducts) {
@@ -139,7 +135,7 @@ public class ProductsTest extends BaseTest {
                 .finishBtn()
                 .backToProductsBtn();
 
-        assertEquals(EMPTY_CART, productsSteps.getCartItemsCount());
+        assertEquals(EMPTY_CART, productsSteps.getCartBadgeCount());
     }
 
     @ParameterizedTest
@@ -156,42 +152,40 @@ public class ProductsTest extends BaseTest {
 
         productsSteps.selectSort(sortType.getValue());
 
-        if (sortType.getValue().equals("az")) {
-            List<String> actual = productsSteps.getProductNames();
-            List<String> expected = new ArrayList<>(actual);
-            Collections.sort(expected);
+        switch (sortType) {
+            case NAME_ASC -> {
+                List<String> actual = productsSteps.getProductNames();
+                List<String> expected = new ArrayList<>(actual);
+                Collections.sort(expected);
 
-            assertEquals(expected, actual);
-        }
+                assertEquals(expected, actual);
+            }
+            case NAME_DESC -> {
+                List<String> actual = productsSteps.getProductNames();
+                List<String> expected = new ArrayList<>(actual);
+                expected.sort(Collections.reverseOrder());
 
-        if (sortType.getValue().equals("za")) {
-            List<String> actual = productsSteps.getProductNames();
-            List<String> expected = new ArrayList<>(actual);
-            expected.sort(Collections.reverseOrder());
+                assertEquals(expected, actual);
+            }
+            case PRICE_ASC -> {
+                List<Double> actual = productsSteps.getProductPrices();
+                List<Double> expected = new ArrayList<>(actual);
+                Collections.sort(expected);
 
-            assertEquals(expected, actual);
-        }
+                assertEquals(expected, actual);
+            }
+            case PRICE_DESC -> {
+                List<Double> actual = productsSteps.getProductPrices();
+                List<Double> expected = new ArrayList<>(actual);
+                expected.sort(Collections.reverseOrder());
 
-        if (sortType.getValue().equals("lohi")) {
-            List<Double> actual = productsSteps.getProductPrices();
-            List<Double> expected = new ArrayList<>(actual);
-            Collections.sort(expected);
-
-            assertEquals(expected, actual);
-        }
-
-        if (sortType.getValue().equals("hilo")) {
-            List<Double> actual = productsSteps.getProductPrices();
-            List<Double> expected = new ArrayList<>(actual);
-            expected.sort(Collections.reverseOrder());
-
-            assertEquals(expected, actual);
+                assertEquals(expected, actual);
+            }
         }
     }
 
     @Test
     public void shouldMatchProductCardWithDetailsPage() {
-
         driver = DriverFactory.createDriver(Browser.CHROME);
 
         LoginSteps loginSteps = new LoginSteps(driver);
@@ -201,12 +195,8 @@ public class ProductsTest extends BaseTest {
                 .openLoginPage()
                 .login(USERNAME, PASSWORD);
 
-        int randomIndex = RANDOM.nextInt(6);
-
-        Product productFromList = productsSteps.getProduct(randomIndex);
-
-        productsSteps.openProduct(randomIndex);
-
+        Product productFromList = productsSteps.getProduct(ONE_PRODUCT);
+        productsSteps.openProduct(ONE_PRODUCT);
         Product productFromDetails = productsSteps.getProductDetails();
 
         assertAll(
@@ -214,5 +204,38 @@ public class ProductsTest extends BaseTest {
                 () -> assertEquals(productFromList.getDescription(), productFromDetails.getDescription()),
                 () -> assertEquals(productFromList.getPrice(), productFromDetails.getPrice())
         );
+    }
+
+    @Test
+    public void shouldShowErrorWhenCheckoutWithEmptyRequiredFields() {
+        driver = DriverFactory.createDriver(Browser.CHROME);
+
+        LoginSteps loginSteps = new LoginSteps(driver);
+        ProductsSteps productsSteps = new ProductsSteps(driver);
+        CheckoutSteps checkoutSteps = new CheckoutSteps(driver);
+
+        loginSteps
+                .openLoginPage()
+                .login(USERNAME, PASSWORD);
+
+        productsSteps.addProductToCart(PRODUCT_BACKPACK);
+
+        assertEquals(ONE_PRODUCT, productsSteps.getProductsPageCartCounter());
+
+        productsSteps.openCart();
+
+        assertEquals(ONE_PRODUCT, productsSteps.getCartItemsCount());
+        assertTrue(productsSteps.isProductNameVisibleInCart(PRODUCT_BACKPACK));
+
+        productsSteps.checkout();
+
+        assertEquals(ONE_PRODUCT, productsSteps.getCartBadgeCount());
+
+        checkoutSteps.continueBtn();
+
+        assertTrue(checkoutSteps.isErrorContainerDisplayed());
+        assertEquals("Error: First Name is required", checkoutSteps.getErrorContainerText());
+        assertEquals(ONE_PRODUCT, productsSteps.getCartBadgeCount());
+        assertFalse(checkoutSteps.isCheckoutOverviewPageOpened());
     }
 }

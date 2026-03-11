@@ -13,6 +13,8 @@ public class CheckoutPage extends BasePage {
     private final By finishBtn = By.id("finish");
     private final By backToProductsBtn = By.id("back-to-products");
 
+    private final By errorContainer = By.cssSelector("[data-test='error']");
+
     public CheckoutPage(WebDriver driver) {
         super(driver);
     }
@@ -33,5 +35,17 @@ public class CheckoutPage extends BasePage {
 
     public void backToProductsBtn() {
         click(backToProductsBtn);
+    }
+
+    public boolean isErrorContainerDisplayed() {
+        return !findAll(errorContainer).isEmpty();
+    }
+
+    public String getErrorContainerText() {
+        return find(errorContainer).getText();
+    }
+
+    public boolean isCheckoutOverviewPageOpened() {
+        return driver.getCurrentUrl().contains("checkout-step-two");
     }
 }
