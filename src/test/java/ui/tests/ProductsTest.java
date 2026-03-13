@@ -1,5 +1,11 @@
 package ui.tests;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -17,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Feature("Products")
 public class ProductsTest extends BaseTest {
 
     private static final int EMPTY_CART = 0;
@@ -31,6 +38,12 @@ public class ProductsTest extends BaseTest {
     private static final Random RANDOM = new Random();
 
     @Test
+    @Story("Cart management")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Добавление товара в корзину и его удаление")
+    @Description("Проверка что пользователь может добавить товар в корзину, "
+            + "после чего удалить его. Проверяется корректность отображения "
+            + "кнопок Add/Remove и обновление счётчика корзины.")
     void shouldAddAndRemoveProductFromCart() {
         initDriver();
 
@@ -54,6 +67,13 @@ public class ProductsTest extends BaseTest {
     }
 
     @Test
+    @Story("Cart management")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Добавление трёх случайных товаров и удаление одного")
+    @Description("Проверка что пользователь может добавить несколько случайных "
+            + "товаров в корзину, после чего удалить один из них. Проверяется "
+            + "корректность отображения товаров, цен и обновление количества "
+            + "товаров в корзине.")
     void shouldAddThreeRandomProductsAndRemoveOneFromCart() {
         initDriver();
 
@@ -96,6 +116,12 @@ public class ProductsTest extends BaseTest {
     }
 
     @Test
+    @Story("Checkout")
+    @Severity(SeverityLevel.BLOCKER)
+    @DisplayName("Оформление заказа с корректными товарами")
+    @Description("Проверка полного сценария оформления заказа: добавление товаров "
+            + "в корзину, переход к оформлению, заполнение информации покупателя, "
+            + "сверка товаров на странице overview и завершение покупки.")
     void shouldCompleteCheckoutWithCorrectProducts() {
         initDriver();
 
@@ -138,6 +164,11 @@ public class ProductsTest extends BaseTest {
 
     @ParameterizedTest
     @EnumSource(SortType.class)
+    @Story("Product sorting")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Сортировка товаров")
+    @Description("Проверка корректной работы сортировки товаров по имени и цене "
+            + "в обоих направлениях: по возрастанию и по убыванию.")
     void shouldSortProducts(SortType sortType) {
         initDriver();
 
@@ -180,6 +211,11 @@ public class ProductsTest extends BaseTest {
     }
 
     @Test
+    @Story("Product details")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Сравнение карточки товара со страницей деталей")
+    @Description("Проверка что информация о товаре в списке товаров совпадает "
+            + "с информацией на странице деталей товара: название, описание и цена.")
     void shouldMatchProductCardWithDetailsPage() {
         initDriver();
 
@@ -199,6 +235,12 @@ public class ProductsTest extends BaseTest {
     }
 
     @Test
+    @Story("Checkout validation")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Ошибка при оформлении заказа без обязательных полей")
+    @Description("Проверка что при попытке продолжить оформление заказа без "
+            + "заполнения обязательных полей отображается сообщение об ошибке, "
+            + "и пользователь не может перейти к следующему шагу оформления.")
     void shouldShowErrorWhenCheckoutWithEmptyRequiredFields() {
         initDriver();
 
@@ -229,6 +271,11 @@ public class ProductsTest extends BaseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {GLITCH_USERNAME, USERNAME})
+    @Story("Checkout")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Оформление покупки для стандартного и glitch пользователя")
+    @Description("Проверка что оформление заказа проходит успешно как для "
+            + "обычного пользователя, так и для пользователя performance_glitch_user.")
     void shouldCompletePurchaseForStandardAndGlitchUsers(String name) {
         initDriver();
 

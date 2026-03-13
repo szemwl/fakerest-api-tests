@@ -8,6 +8,8 @@ Lombok 1.18.30
 Selenium 4.2  
 WebDriver 5.8  
 SLF4J 2.0.13  
+Allure 2.33  
+AspectJ 1.9.22  
 
 ---
 

@@ -7,6 +7,7 @@ import ui.driver.DriverFactory;
 import ui.steps.CheckoutSteps;
 import ui.steps.LoginSteps;
 import ui.steps.ProductsSteps;
+import ui.utils.ScreenshotUtils;
 
 public class BaseTest {
 
@@ -30,6 +31,7 @@ public class BaseTest {
     @AfterEach
     void tearDown() {
         if (driver != null) {
+            ScreenshotUtils.attachScreenshot(driver);
             driver.quit();
         }
     }

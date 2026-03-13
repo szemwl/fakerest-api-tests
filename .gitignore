@@ -15,5 +15,7 @@ Thumbs.db
 # Logs
 *.log
 
-allure-results/
-allure-report/
+# Allure
+.allure
+allure-results
+allure-report
