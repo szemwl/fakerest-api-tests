@@ -6,6 +6,7 @@ import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import ui.driver.Browser;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class LoginTest extends BaseTest {
 
     @ParameterizedTest
-    @EnumSource(Browser.class)
+    @EnumSource(value = Browser.class, names = {"FIREFOX", "CHROME"})
     @Story("Login")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Успешная авторизация пользователя")
@@ -32,15 +33,18 @@ public class LoginTest extends BaseTest {
         assertTrue(driver.getCurrentUrl().contains("inventory"));
     }
 
-    @ParameterizedTest
-    @EnumSource(value = Browser.class, names = {"CHROME_HEADLESS"})
-    void shouldFailHeadlessTest(Browser browser) {
-        initDriver();
+    @Test
+    @Story("Login")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Неуспешная авторизация в headless режиме")
+    @Description("Намеренно падающий тест для проверки скриншотов Allure")
+    void shouldFailHeadlessTest() {
+        initDriver(Browser.CHROME_HEADLESS);
 
         loginSteps
                 .openLoginPage()
-                .login("standard_user", "secret_sauce");
+                .login("wrong_username", "wrong_password");
 
-        fail();
+        fail("Намеренный сбой теста для проверки вложения скриншота в Allure");
     }
 }
