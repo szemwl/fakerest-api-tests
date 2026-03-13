@@ -12,6 +12,7 @@ public class CartPage extends BasePage {
 
     private final By cartItems = By.className("cart_item");
     private final By cartBadge = By.className("shopping_cart_badge");
+
     private final By continueShoppingBtn = By.id("continue-shopping");
     private final By checkoutBtn = By.id("checkout");
 
