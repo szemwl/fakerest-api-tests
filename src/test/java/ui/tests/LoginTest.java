@@ -5,6 +5,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,5 +47,21 @@ public class LoginTest extends BaseTest {
                 .login("wrong_username", "wrong_password");
 
         fail("Намеренный сбой теста для проверки вложения скриншота в Allure");
+    }
+
+    @Test
+    @Disabled
+    @Story("Login")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Преднамеренно пропущенный тест")
+    @Description("Намеренно пропущенный тест для проверки Allure")
+    void shouldSkippedHeadlessTest() {
+        initDriver(Browser.CHROME_HEADLESS);
+
+        loginSteps
+                .openLoginPage()
+                .login("wrong_username", "wrong_password");
+
+        fail("Намеренный сбой теста для проверки Allure");
     }
 }
