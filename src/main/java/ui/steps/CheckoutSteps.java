@@ -14,56 +14,56 @@ public class CheckoutSteps {
         this.checkoutPage = new CheckoutPage(driver);
     }
 
-    @Step("")
+    @Step("Заполнить данные покупателя: имя={0}, фамилия={1}, почтовый индекс={2}")
     public CheckoutSteps fillCustomerInfo(String name, String surname, String zip) {
         checkoutPage.fillCustomerInfo(name, surname, zip);
         return this;
     }
 
-    @Step("")
+    @Step("Нажать кнопку Continue")
     public CheckoutSteps continueBtn() {
         checkoutPage.continueBtn();
         return this;
     }
 
-    @Step("")
+    @Step("Нажать кнопку Finish")
     public CheckoutSteps finishBtn() {
         checkoutPage.finishBtn();
         return this;
     }
 
-    @Step("")
+    @Step("Нажать кнопку Back to Products")
     public CheckoutSteps backToProductsBtn() {
         checkoutPage.backToProductsBtn();
         return this;
     }
 
-    @Step("")
+    @Step("Проверить отображение контейнера ошибки")
     public boolean isErrorContainerDisplayed() {
         return checkoutPage.isErrorContainerDisplayed();
     }
 
-    @Step("")
+    @Step("Получить текст сообщения об ошибке")
     public String getErrorContainerText() {
         return checkoutPage.getErrorContainerText();
     }
 
-    @Step("")
+    @Step("Проверить, что открыта страница Checkout Overview")
     public boolean isCheckoutOverviewPageOpened() {
         return checkoutPage.isCheckoutOverviewPageOpened();
     }
 
-    @Step("")
+    @Step("Проверить, что открыта страница Checkout Complete")
     public boolean isCheckoutCompletePageOpened() {
         return checkoutPage.isCheckoutCompletePageOpened();
     }
 
-    @Step("")
+    @Step("Получить текст сообщения о завершении заказа")
     public String getCompleteMessageText() {
         return checkoutPage.getCompleteMessageText();
     }
 
-    @Step("")
+    @Step("Получить список товаров на странице Overview")
     public List<Product> getOverviewProducts() {
         return checkoutPage.getOverviewProducts();
     }
