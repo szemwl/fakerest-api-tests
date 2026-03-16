@@ -8,6 +8,9 @@ target/
 *.iws
 *.ipr
 
+# VS Code
+.vscode/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -17,5 +20,5 @@ Thumbs.db
 
 # Allure
 .allure
-allure-results
-allure-report
+allure-results/
+allure-report/
