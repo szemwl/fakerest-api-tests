@@ -3,6 +3,7 @@ package kafka.kafka;
 import java.util.Properties;
 
 public class KafkaSettings {
+
     private final String bootstrapServers;
 
     public KafkaSettings(String bootstrapServers) {

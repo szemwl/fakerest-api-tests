@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 public class SimpleKafkaProducer implements AutoCloseable {
+
     private final KafkaProducer<String, String> producer;
     private final ObjectMapper objectMapper = new ObjectMapper();
 

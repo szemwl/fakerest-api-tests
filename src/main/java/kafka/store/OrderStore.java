@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class OrderStore {
+
     private final Map<String, Order> orders = new ConcurrentHashMap<>();
     private final Set<String> processedEventIds = ConcurrentHashMap.newKeySet();
 

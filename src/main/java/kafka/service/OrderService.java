@@ -1,12 +1,13 @@
 package kafka.service;
 
-import kafka.store.OrderStore;
 import kafka.event.OrderCreatedEvent;
 import kafka.kafka.SimpleKafkaProducer;
 import kafka.model.Order;
 import kafka.model.OrderStatus;
+import kafka.store.OrderStore;
 
 public class OrderService {
+
     private static final String ORDERS_TOPIC = "orders";
 
     private final OrderStore orderStore;

@@ -1,17 +1,18 @@
 package kafka.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kafka.store.OrderStore;
 import kafka.event.PaymentEvent;
 import kafka.kafka.KafkaSettings;
 import kafka.kafka.SimpleKafkaConsumer;
 import kafka.kafka.SimpleKafkaProducer;
 import kafka.model.OrderStatus;
+import kafka.store.OrderStore;
 
 import java.time.Duration;
 import java.util.UUID;
 
 public class PaymentEventConsumer implements AutoCloseable {
+
     private static final String PAYMENTS_TOPIC = "payments";
     private static final String PAYMENTS_DLQ_TOPIC = "payments.dlq";
 
