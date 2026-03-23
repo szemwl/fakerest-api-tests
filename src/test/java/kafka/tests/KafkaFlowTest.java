@@ -9,7 +9,8 @@ import kafka.model.OrderStatus;
 import kafka.service.OrderService;
 import kafka.service.PaymentEventConsumer;
 import kafka.store.OrderStore;
-import kafka.support.KafkaTestHelper;
+import kafka.support.KafkaMessageReader;
+import kafka.support.KafkaOffsetHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -31,7 +32,8 @@ public class KafkaFlowTest {
     private static final String PAYMENTS_DLQ_TOPIC = "payments.dlq";
 
     private final KafkaSettings settings = new KafkaSettings(BOOTSTRAP_SERVERS);
-    private final KafkaTestHelper kafkaHelper = new KafkaTestHelper(BOOTSTRAP_SERVERS);
+    private final KafkaOffsetHelper offsetHelper = new KafkaOffsetHelper(settings);
+    private final KafkaMessageReader messageReader = new KafkaMessageReader(settings, offsetHelper);
 
     @Test
     @DisplayName("Kafka smoke - можно отправить и прочитать сообщение")
@@ -39,7 +41,7 @@ public class KafkaFlowTest {
         String expected = "smoke-" + UUID.randomUUID();
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings)) {
-            String actual = kafkaHelper.readNewRawMessage(
+            String actual = messageReader.readNewRawMessage(
                     ORDERS_TOPIC,
                     () -> producer.sendRaw(ORDERS_TOPIC, "key-" + UUID.randomUUID(), expected)
             );
@@ -57,7 +59,7 @@ public class KafkaFlowTest {
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings)) {
             OrderService orderService = new OrderService(orderStore, producer);
 
-            OrderCreatedEvent eventFromKafka = kafkaHelper.readNewMessage(
+            OrderCreatedEvent eventFromKafka = messageReader.readNewMessage(
                     ORDERS_TOPIC,
                     OrderCreatedEvent.class,
                     () -> orderService.createOrder(orderId)
@@ -76,10 +78,10 @@ public class KafkaFlowTest {
     void consumerTest() {
         OrderStore orderStore = new OrderStore();
         String orderId = "order-paid-" + UUID.randomUUID();
-        String groupId = kafkaHelper.randomGroupId();
-
+        String groupId = offsetHelper.randomGroupId();
         orderStore.save(new Order(orderId, OrderStatus.NEW));
-        kafkaHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
+
+        offsetHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings);
              PaymentEventConsumer paymentConsumer = new PaymentEventConsumer(settings, groupId, orderStore)) {
@@ -104,15 +106,15 @@ public class KafkaFlowTest {
     @DisplayName("Negative test - битый JSON уходит в DLQ")
     void negativeDlqTest() {
         OrderStore orderStore = new OrderStore();
-        String groupId = kafkaHelper.randomGroupId();
+        String groupId = offsetHelper.randomGroupId();
         String brokenJson = "{\"eventId\":\"broken-1\",\"orderId\":\"123\",\"success\":tru";
 
-        kafkaHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
+        offsetHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings);
              PaymentEventConsumer paymentConsumer = new PaymentEventConsumer(settings, groupId, orderStore)) {
 
-            String messageFromDlq = kafkaHelper.readNewRawMessage(
+            String messageFromDlq = messageReader.readNewRawMessage(
                     PAYMENTS_DLQ_TOPIC,
                     () -> {
                         producer.sendRaw(PAYMENTS_TOPIC, "broken-key", brokenJson);
@@ -130,10 +132,10 @@ public class KafkaFlowTest {
         OrderStore orderStore = new OrderStore();
         String orderId = "order-duplicate-" + UUID.randomUUID();
         String eventId = "event-duplicate-" + UUID.randomUUID();
-        String groupId = kafkaHelper.randomGroupId();
-
+        String groupId = offsetHelper.randomGroupId();
         orderStore.save(new Order(orderId, OrderStatus.NEW));
-        kafkaHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
+
+        offsetHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings);
              PaymentEventConsumer paymentConsumer = new PaymentEventConsumer(settings, groupId, orderStore)) {

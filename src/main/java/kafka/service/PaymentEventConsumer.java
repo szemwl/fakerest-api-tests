@@ -38,8 +38,7 @@ public class PaymentEventConsumer implements AutoCloseable {
             return;
         }
 
-        boolean firstProcessing = orderStore.markEventProcessed(event.eventId());
-        if (!firstProcessing) {
+        if (!orderStore.markEventProcessed(event.eventId())) {
             return;
         }
 
