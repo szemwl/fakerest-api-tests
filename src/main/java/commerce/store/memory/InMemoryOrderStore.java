@@ -1,11 +1,11 @@
-package commerce.store;
+package commerce.store.memory;
 
 import commerce.model.Order;
 import commerce.model.OrderStatus;
+import commerce.store.OrderStore;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryOrderStore implements OrderStore {

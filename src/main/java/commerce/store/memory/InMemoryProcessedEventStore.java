@@ -1,4 +1,6 @@
-package commerce.store;
+package commerce.store.memory;
+
+import commerce.store.ProcessedEventStore;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

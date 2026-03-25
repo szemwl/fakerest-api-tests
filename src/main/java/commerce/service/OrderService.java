@@ -4,16 +4,17 @@ import commerce.event.OrderCreatedEvent;
 import commerce.kafka.SimpleKafkaProducer;
 import commerce.model.Order;
 import commerce.model.OrderStatus;
-import commerce.store.InMemoryOrderStore;
+import commerce.store.OrderStore;
+import commerce.store.memory.InMemoryOrderStore;
 
 public class OrderService {
 
     private static final String ORDERS_TOPIC = "orders";
 
-    private final InMemoryOrderStore orderStore;
+    private final OrderStore orderStore;
     private final SimpleKafkaProducer producer;
 
-    public OrderService(InMemoryOrderStore orderStore, SimpleKafkaProducer producer) {
+    public OrderService(OrderStore orderStore, SimpleKafkaProducer producer) {
         this.orderStore = orderStore;
         this.producer = producer;
     }

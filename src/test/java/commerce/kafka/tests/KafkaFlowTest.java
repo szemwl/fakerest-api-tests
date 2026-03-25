@@ -1,25 +1,25 @@
 package commerce.kafka.tests;
 
-import commerce.store.InMemoryProcessedEventStore;
-import commerce.store.OrderStore;
-import commerce.store.ProcessedEventStore;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Severity;
-import io.qameta.allure.SeverityLevel;
-import io.qameta.allure.Story;
 import commerce.event.OrderCreatedEvent;
 import commerce.event.PaymentEvent;
 import commerce.kafka.KafkaSettings;
 import commerce.kafka.SimpleKafkaProducer;
+import commerce.kafka.support.KafkaMessageReader;
+import commerce.kafka.support.KafkaOffsetHelper;
 import commerce.model.Order;
 import commerce.model.OrderStatus;
 import commerce.service.OrderService;
 import commerce.service.PaymentEventConsumer;
 import commerce.service.PaymentEventHandler;
-import commerce.store.InMemoryOrderStore;
-import commerce.kafka.support.KafkaMessageReader;
-import commerce.kafka.support.KafkaOffsetHelper;
+import commerce.store.OrderStore;
+import commerce.store.ProcessedEventStore;
+import commerce.store.memory.InMemoryOrderStore;
+import commerce.store.memory.InMemoryProcessedEventStore;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Execution(ExecutionMode.SAME_THREAD)
 @Feature("Kafka")
 @DisplayName("Kafka-тесты обработки заказов и оплат")
-public class KafkaFlowTest {
+public class KafkaFlowTest extends BaseTest {
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private static final String ORDERS_TOPIC = "orders";
@@ -69,7 +69,6 @@ public class KafkaFlowTest {
     @DisplayName("Заказ создаётся и событие уходит в Kafka")
     @Description("Проверка создания заказа и отправки события")
     void producerTest() {
-        InMemoryOrderStore orderStore = new InMemoryOrderStore();
         String orderId = "order-producer-" + UUID.randomUUID();
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings)) {
@@ -95,8 +94,6 @@ public class KafkaFlowTest {
     @DisplayName("Успешный PaymentEvent переводит заказ в статус PAID")
     @Description("Проверка смены статуса заказа на PAID при успешной обработке события оплаты")
     void consumerTest() {
-        OrderStore orderStore = new InMemoryOrderStore();
-        ProcessedEventStore processedEventStore = new InMemoryProcessedEventStore();
         PaymentEventHandler handler = new PaymentEventHandler(orderStore, processedEventStore);
 
         String orderId = "order-paid-" + UUID.randomUUID();
