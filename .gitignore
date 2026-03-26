@@ -7,9 +7,15 @@ target/
 *.iml
 *.iws
 *.ipr
+out/
 
 # VS Code
 .vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
 
 # OS
 .DS_Store
@@ -22,3 +28,14 @@ Thumbs.db
 .allure
 allure-results/
 allure-report/
+
+# Environment / local config
+.env
+*.local
+
+# Java
+*.class
+
+# Temporary files
+*.tmp
+*.temp
