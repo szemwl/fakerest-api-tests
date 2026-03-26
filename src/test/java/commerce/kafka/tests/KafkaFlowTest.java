@@ -4,17 +4,12 @@ import commerce.event.OrderCreatedEvent;
 import commerce.event.PaymentEvent;
 import commerce.kafka.KafkaSettings;
 import commerce.kafka.SimpleKafkaProducer;
-import commerce.kafka.support.KafkaMessageReader;
-import commerce.kafka.support.KafkaOffsetHelper;
+import commerce.kafka.support.KafkaTestFacade;
 import commerce.model.Order;
 import commerce.model.OrderStatus;
 import commerce.service.OrderService;
 import commerce.service.PaymentEventConsumer;
 import commerce.service.PaymentEventHandler;
-import commerce.store.OrderStore;
-import commerce.store.ProcessedEventStore;
-import commerce.store.memory.InMemoryOrderStore;
-import commerce.store.memory.InMemoryProcessedEventStore;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
@@ -42,8 +37,7 @@ public class KafkaFlowTest extends BaseTest {
     private static final String PAYMENTS_DLQ_TOPIC = "payments.dlq";
 
     private final KafkaSettings settings = new KafkaSettings(BOOTSTRAP_SERVERS);
-    private final KafkaOffsetHelper offsetHelper = new KafkaOffsetHelper(settings);
-    private final KafkaMessageReader messageReader = new KafkaMessageReader(settings, offsetHelper);
+    private final KafkaTestFacade kafkaFacade = new KafkaTestFacade(settings);
 
     @Test
     @Story("Smoke")
@@ -54,7 +48,7 @@ public class KafkaFlowTest extends BaseTest {
         String expected = "smoke-" + UUID.randomUUID();
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings)) {
-            String actual = messageReader.readNewRawMessage(
+            String actual = kafkaFacade.readNewRawMessage(
                     ORDERS_TOPIC,
                     () -> producer.sendRaw(ORDERS_TOPIC, "key-" + UUID.randomUUID(), expected)
             );
@@ -74,7 +68,7 @@ public class KafkaFlowTest extends BaseTest {
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings)) {
             OrderService orderService = new OrderService(orderStore, producer);
 
-            OrderCreatedEvent eventFromKafka = messageReader.readNewMessage(
+            OrderCreatedEvent eventFromKafka = kafkaFacade.readNewMessage(
                     ORDERS_TOPIC,
                     OrderCreatedEvent.class,
                     () -> orderService.createOrder(orderId)
@@ -97,10 +91,9 @@ public class KafkaFlowTest extends BaseTest {
         PaymentEventHandler handler = new PaymentEventHandler(orderStore, processedEventStore);
 
         String orderId = "order-paid-" + UUID.randomUUID();
-        String groupId = offsetHelper.randomGroupId();
         orderStore.save(new Order(orderId, OrderStatus.NEW));
 
-        offsetHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
+        String groupId = kafkaFacade.createNewGroupAtEnd(PAYMENTS_TOPIC);
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings);
              PaymentEventConsumer paymentConsumer = new PaymentEventConsumer(settings, groupId, handler)) {
@@ -127,19 +120,16 @@ public class KafkaFlowTest extends BaseTest {
     @DisplayName("Битый JSON отправляется в DLQ")
     @Description("Проверка отправки невалидного JSON-сообщения в payments.dlq")
     void negativeDlqTest() {
-        OrderStore orderStore = new InMemoryOrderStore();
-        ProcessedEventStore processedEventStore = new InMemoryProcessedEventStore();
         PaymentEventHandler handler = new PaymentEventHandler(orderStore, processedEventStore);
 
-        String groupId = offsetHelper.randomGroupId();
         String brokenJson = "{\"eventId\":\"broken-1\",\"orderId\":\"123";
 
-        offsetHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
+        String groupId = kafkaFacade.createNewGroupAtEnd(PAYMENTS_TOPIC);
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings);
              PaymentEventConsumer paymentConsumer = new PaymentEventConsumer(settings, groupId, handler)) {
 
-            String messageFromDlq = messageReader.readNewRawMessage(
+            String messageFromDlq = kafkaFacade.readNewRawMessage(
                     PAYMENTS_DLQ_TOPIC,
                     () -> {
                         producer.sendRaw(PAYMENTS_TOPIC, "broken-key", brokenJson);
@@ -157,16 +147,14 @@ public class KafkaFlowTest extends BaseTest {
     @DisplayName("Повторное событие не обрабатывается второй раз")
     @Description("Проверка, что событие с тем же eventId повторно не влияет на состояние заказа")
     void duplicateEventTest() {
-        OrderStore orderStore = new InMemoryOrderStore();
-        ProcessedEventStore processedEventStore = new InMemoryProcessedEventStore();
         PaymentEventHandler handler = new PaymentEventHandler(orderStore, processedEventStore);
 
         String orderId = "order-duplicate-" + UUID.randomUUID();
         String eventId = "event-duplicate-" + UUID.randomUUID();
-        String groupId = offsetHelper.randomGroupId();
         orderStore.save(new Order(orderId, OrderStatus.NEW));
 
-        offsetHelper.moveGroupToEnd(PAYMENTS_TOPIC, groupId);
+        int beforeCount = processedEventStore.processedEventsCount();
+        String groupId = kafkaFacade.createNewGroupAtEnd(PAYMENTS_TOPIC);
 
         try (SimpleKafkaProducer producer = new SimpleKafkaProducer(settings);
              PaymentEventConsumer paymentConsumer = new PaymentEventConsumer(settings, groupId, handler)) {
@@ -182,9 +170,11 @@ public class KafkaFlowTest extends BaseTest {
             Order updatedOrder = orderStore.findById(orderId)
                     .orElseThrow(() -> new AssertionError("Заказ не найден после обработки дублей"));
 
+            int afterCount = processedEventStore.processedEventsCount();
+
             assertEquals(OrderStatus.PAID, updatedOrder.status());
             assertTrue(processedEventStore.isEventProcessed(eventId));
-            assertEquals(1, processedEventStore.processedEventsCount());
+            assertEquals(++beforeCount, afterCount);
         }
     }
 }

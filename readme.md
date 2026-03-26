@@ -17,11 +17,11 @@ AspectJ 1.9.22
 Выбор типа хранилища задаётся в файле `src/test/resources/config.properties`  
 через свойство `test.config.file`:
 
-### Для тестирования in-memory
-#test.config.file=application-test-memory.properties
+### For testing using In-memory
+test.config.file=application-test-memory.properties
 
-### Для тестирования postgreSQL
-#test.config.file=application-test-postgres.properties
+### For testing using PostgreSQL
+test.config.file=application-test-postgres.properties
 
 ---
 

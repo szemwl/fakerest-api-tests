@@ -11,9 +11,6 @@ public final class ConfigLoader {
 
     private static AppConfig appConfig;
 
-    private ConfigLoader() {
-    }
-
     public static AppConfig load() {
         if (appConfig == null) {
             Properties properties = new Properties();
