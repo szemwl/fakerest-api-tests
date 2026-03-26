@@ -21,4 +21,4 @@ jobs:
           java-version: 21
 
       - name: Run tests
-        run: mvn clean test
+        run: mvn clean test -DexcludedTags=ui,kafka

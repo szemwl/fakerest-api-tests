@@ -1,5 +1,6 @@
 package commerce.ui.tests;
 
+import commerce.ui.driver.Browser;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
@@ -7,15 +8,16 @@ import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import commerce.ui.driver.Browser;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @Feature("Login")
+@Tag("ui")
 @DisplayName("Тесты авторизации")
 public class LoginTest extends BaseTest {
 

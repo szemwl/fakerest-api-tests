@@ -1,17 +1,18 @@
 package commerce.ui.tests;
 
+import commerce.ui.model.Product;
+import commerce.ui.model.SortType;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import commerce.ui.model.Product;
-import commerce.ui.model.SortType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Feature("Products")
+@Tag("ui")
 @DisplayName("Тесты товаров")
 public class ProductsTest extends BaseTest {
 

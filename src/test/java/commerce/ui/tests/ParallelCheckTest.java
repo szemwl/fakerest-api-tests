@@ -6,13 +6,15 @@ import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static commerce.ui.driver.Browser.CHROME;
 import static commerce.ui.driver.Browser.FIREFOX;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Feature("ParallelCheck")
+@Tag("ui")
 @DisplayName("Тесты запуска в параллельном режиме")
 public class ParallelCheckTest extends BaseTest {
 

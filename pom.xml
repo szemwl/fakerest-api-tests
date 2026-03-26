@@ -13,6 +13,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <excludedTags></excludedTags>
     </properties>
 
     <dependencies>
@@ -121,6 +122,11 @@
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar"
                     </argLine>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.tags.exclude = ${excludedTags}
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
 
